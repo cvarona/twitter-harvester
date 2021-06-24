@@ -18,32 +18,17 @@ import java.util.stream.Collectors;
 @Scope("singleton")
 public class Harvester implements StatusListener {
 
-    @Value("${twh.defaultMinimumFollowerCount}")
-    private int minimumFollowerCount;
-
-    @Value("${twh.defaultTargetLanguages}")
-    private String targetLanguagesStr;
+    @Resource
+    private HarvestFilter filter;
 
     @Resource
     private TweetRepository tweetRepository;
 
-    private Set<String> targetLanguages;
-
     private long insertCount = 0;
-
-    @PostConstruct
-    public void initTargetLanguages() {
-        // The target languages configuration property is a comma separated string that must be split
-        targetLanguages = new HashSet<String>(Arrays.asList(this.targetLanguagesStr.split(",")));
-    }
 
     @Override
     public void onStatus(Status status) {
-
-        HashtagEntity[] hashtagEntities = status.getHashtagEntities();
-        // In order to be able to test the top hashtags retrieval endpoint just tweets with
-        // at least one tag will be stored
-        if (hashtagEntities.length != 0 && status.getUser().getFollowersCount() >= minimumFollowerCount && targetLanguages.contains(status.getLang().toLowerCase())) {
+        if (filter.harvest(status)) {
 
             log.info("I'll keep {}", status.getText());
             Tweet tweet = new Tweet();
@@ -57,7 +42,7 @@ public class Harvester implements StatusListener {
                 tweet.setLocation(location);
             }
 
-            List<String> hashtags = Arrays.stream(hashtagEntities).map(hte -> hte.getText()).collect(Collectors.toList());
+            List<String> hashtags = Arrays.stream(status.getHashtagEntities()).map(hte -> hte.getText()).collect(Collectors.toList());
             tweet.setHashtags(hashtags);
             tweet.setValidated(false);
 
