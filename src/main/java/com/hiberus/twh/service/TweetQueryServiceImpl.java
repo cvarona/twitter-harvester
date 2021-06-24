@@ -29,7 +29,7 @@ public class TweetQueryServiceImpl implements TweetQueryService {
     @Override
     public Flux<TweetDto> findAll() {
         log.info("Find all");
-        return tweetRepository.findAll().log().map(tweetDtoConverter::toDto);
+        return tweetRepository.findAll().map(tweetDtoConverter::toDto);
     }
 
     @Override
