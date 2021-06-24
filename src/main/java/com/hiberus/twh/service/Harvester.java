@@ -33,6 +33,7 @@ public class Harvester implements StatusListener {
 
     @PostConstruct
     public void initTargetLanguages() {
+        // The target languages configuration property is a comma separated string that must be split
         targetLanguages = new HashSet<String>(Arrays.asList(this.targetLanguagesStr.split(",")));
     }
 

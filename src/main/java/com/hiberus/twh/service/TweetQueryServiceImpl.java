@@ -41,22 +41,29 @@ public class TweetQueryServiceImpl implements TweetQueryService {
     @Override
     public Mono<Set<String>> getMostUsedHashtags() {
         log.info("Get most used hashtags");
-        return tweetRepository.findAll().map(t -> t.getHashtags()).reduce(new HashMap<String, Integer>(), (mostUsed, next) -> {
-            next.forEach(ht -> {
-                if (mostUsed.containsKey(ht)) {
-                    mostUsed.put(ht, mostUsed.get(ht) + 1);
-                } else {
-                    mostUsed.put(ht, 1);
-                }
-            });
+        return tweetRepository.findAll().map(t -> t.getHashtags())
+                // First we count how many times has appeared every tag so far
+                .reduce(new HashMap<String, Integer>(), (mostUsed, next) -> {
+                    next.forEach(ht -> {
+                        if (mostUsed.containsKey(ht)) {
+                            mostUsed.put(ht, mostUsed.get(ht) + 1);
+                        } else {
+                            mostUsed.put(ht, 1);
+                        }
+                    });
 
-            return mostUsed;
-        }).map(m -> {
-            List<Map.Entry<String, Integer>> entries = new ArrayList<>(m.entrySet());
-            entries.sort(Comparator.comparingInt(Map.Entry::getValue));
-            List<Map.Entry<String, Integer>> mostUsed = entries.size() > hashtagCount ? entries.subList(entries.size() - hashtagCount, entries.size()) : entries;
-            return mostUsed.stream().map(e -> e.getKey()).collect(Collectors.toSet());
-        });
+                    return mostUsed;
+                })
+                .map(m -> {
+                    // We then take the map's entries and sort them according to their value
+                    List<Map.Entry<String, Integer>> entries = new ArrayList<>(m.entrySet());
+                    entries.sort(Comparator.comparingInt(Map.Entry::getValue));
+
+                    // We then take at most the list last n positions, according to the value
+                    // configured in application.properties
+                    List<Map.Entry<String, Integer>> mostUsed = entries.size() > hashtagCount ? entries.subList(entries.size() - hashtagCount, entries.size()) : entries;
+                    return mostUsed.stream().map(e -> e.getKey()).collect(Collectors.toSet());
+                });
     }
 
     @Override
