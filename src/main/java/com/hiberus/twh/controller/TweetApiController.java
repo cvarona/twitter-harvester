@@ -28,7 +28,7 @@ public class TweetApiController {
         return Boolean.parseBoolean(validated) ? tweetQueryService.findValidated() : tweetQueryService.findAll();
     }
 
-    @RequestMapping(value = "/tweets/{id}/validate", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/tweets/{id}", method = RequestMethod.PATCH)
     @ResponseStatus(HttpStatus.OK)
     public Mono<Boolean> validateTweet(@PathVariable("id") Long id) {
         return tweetQueryService.validate(id);
