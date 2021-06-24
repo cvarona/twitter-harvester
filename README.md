@@ -17,3 +17,5 @@ These are the REST api endpoints:
 *  `http://localhost:8081/tweets/{{tweet id}}/validate` to validate a certain tweet   
 *  `http://localhost:8081/tweets?validated=true` to get just validated tweets
 *  `http://localhost:8081/top-hashtags` to get the most used hashtags
+
+You can use the provided `Tweet harvesting & querying.postman_collection.json` Postman collection.

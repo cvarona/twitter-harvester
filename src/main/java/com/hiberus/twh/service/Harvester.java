@@ -41,6 +41,8 @@ public class Harvester implements StatusListener {
     public void onStatus(Status status) {
 
         HashtagEntity[] hashtagEntities = status.getHashtagEntities();
+        // In order to be able to test the top hashtags retrieval endpoint just tweets with
+        // at least one tag will be stored
         if (hashtagEntities.length != 0 && status.getUser().getFollowersCount() >= minimumFollowerCount && targetLanguages.contains(status.getLang().toLowerCase())) {
 
             log.info("I'll keep {}", status.getText());
